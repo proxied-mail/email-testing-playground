@@ -17,12 +17,6 @@ const initEmailer = async () => {
     return emailSender
   }
 
-  if (!process.env.SENDGRID_API_KEY) {
-    throw new Error(`Missing SENDGRID_API_KEY variable`)
-  }
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-  sgClient.setApiKey(process.env.SENDGRID_API_KEY)
-
   emailSender = {
     /**
      * Sends an email through SendGrid
@@ -44,29 +38,30 @@ const initEmailer = async () => {
      * @see Docs https://sendgrid.api-docs.io/v3.0/mail-send/v3-mail-send
      */
     async sendTemplateEmail({ from, template_id, dynamic_template_data, to }) {
-      const body = {
-        from: {
-          email: from || process.env.SENDGRID_FROM,
-          name: 'Confirmation system',
-        },
-        personalizations: [
-          {
-            to: [{ email: to }],
-            dynamic_template_data,
-          },
-        ],
-        template_id,
-      }
 
-      const request = {
+
+      // console.log('zalupa:')
+      // console.log(process.env)
+      //send json
+      return fetch('https://proxiedmail.com/api/v1/send-message', {
         method: 'POST',
-        url: 'v3/mail/send',
-        body,
-      }
-      const [response] = await sgClient.request(request)
-
-      return response
-    },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Token': process.env.PROXIEDMAIL_API_TOKEN,
+        },
+        body: JSON.stringify({
+          "email": to,
+          "name": "Confirmation",
+          "message": "Email confirmation code is " + dynamic_template_data.code + '.',
+          'subject': 'Confirmation code'
+        })
+      }).then(response => response.json()).then(data => {
+        console.log(data);
+      }).catch((error) => {
+        console.error('Error:', error);
+      });
+    }
   }
 
   return emailSender
