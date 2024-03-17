@@ -1,4 +1,4 @@
-FROM node:latest as pm-playground
+FROM node:18-bullseye as pm-playground
 
 LABEL version="1.0"
 
