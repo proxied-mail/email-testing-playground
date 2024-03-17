@@ -6,6 +6,7 @@ COPY . /app
 
 WORKDIR "/app"
 
+RUN ["ulimit", "-n", "1024"]
 RUN ["npm", "install"]
 
 COPY [".", "./"]
