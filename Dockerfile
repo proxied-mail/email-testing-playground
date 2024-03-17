@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:latest as pm-playground
 
 LABEL version="1.0"
 
